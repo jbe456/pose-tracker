@@ -1,8 +1,6 @@
 {
   "name": "pose-tracker-server",
-  "version": "1.0.0",
   "type": "module",
-  "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
@@ -11,7 +9,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "ytdl-core": "^4.11.5",
+    "ytdl-core": "npm:@distube/ytdl-core@^4.16.12",
     "zod": "^3.23.8"
   },
   "devDependencies": {
