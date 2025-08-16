@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
+import { createPoseLandmarker } from "./lib/poseLandmarker";
 import VideoOverlay from "./VideoOverlay";
 
 export default function App() {
@@ -8,17 +8,7 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      const filesetResolver = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.11/wasm"
-      );
-      const lm = await PoseLandmarker.createFromOptions(filesetResolver, {
-        baseOptions: {
-          modelAssetPath:
-            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task",
-        },
-        runningMode: "VIDEO",
-        numPoses: 2,
-      });
+      const lm = await createPoseLandmarker();
       setPoseLandmarker(lm);
     })();
   }, []);
