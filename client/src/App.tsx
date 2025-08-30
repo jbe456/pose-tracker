@@ -14,7 +14,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="flex flex-col h-screen p-6">
       <h1 className="text-3xl font-bold mb-4">YouTube Pose Tracker</h1>
       <input
         type="url"
