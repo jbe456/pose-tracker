@@ -4,12 +4,27 @@ import {
   NormalizedLandmark,
   PoseLandmarker,
 } from "@mediapipe/tasks-vision";
-import { EDGES } from "./lib/edges";
+import { EDGES, LANDMARKS } from "./lib/poseTopology";
+
+const PERSON_COLORS = [
+  "rgba(99,102,241,0.9)", // indigo
+  "rgba(16,185,129,0.9)", // emerald
+];
 
 interface VideoOverlayProps {
   ytUrl: string;
   poseLandmarker: PoseLandmarker;
 }
+
+type DrawingOptions = {
+  showSkeleton: boolean;
+  showLandmarks: boolean;
+};
+
+type DrawingContext = {
+  width: number;
+  height: number;
+};
 
 function syncCanvasToVideo(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
   if (!video.videoWidth || !video.videoHeight) return;
@@ -24,42 +39,44 @@ function clearCanvas(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) {
 
 const drawResults = (
   ctx: CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
   draw: DrawingUtils,
   landmarks: NormalizedLandmark[][],
-  showSkeleton: boolean,
-  showLandmarks: boolean
+  drawingContext: DrawingContext,
+  drawingOptions: DrawingOptions
 ) => {
-  landmarks.forEach((lm) => {
-    if (showSkeleton) {
+  landmarks.forEach((lm, index) => {
+    const personColor = PERSON_COLORS[index % PERSON_COLORS.length];
+
+    if (drawingOptions.showSkeleton) {
       EDGES.forEach(([a, b]) => {
         const pa = lm[a];
         const pb = lm[b];
-        if (
-          pa &&
-          pb &&
-          (pa.visibility ?? 1) > 0.5 &&
-          (pb.visibility ?? 1) > 0.5
-        ) {
+        if (pa && pb) {
           ctx.beginPath();
-          ctx.moveTo(pa.x * canvas.width, pa.y * canvas.height);
-          ctx.lineTo(pb.x * canvas.width, pb.y * canvas.height);
+          ctx.moveTo(pa.x * drawingContext.width, pa.y * drawingContext.height);
+          ctx.lineTo(pb.x * drawingContext.width, pb.y * drawingContext.height);
           ctx.lineWidth = 3;
-          ctx.strokeStyle = "rgba(99,102,241,0.9)";
+          ctx.strokeStyle = personColor;
           ctx.stroke();
         }
       });
     }
-    if (showLandmarks) {
-      draw.drawLandmarks(
-        lm.map((p) => ({
-          x: p.x * canvas.width,
-          y: p.y * canvas.height,
-          z: 0,
-          visibility: 1,
-        })),
-        { radius: 3 }
-      );
+
+    if (drawingOptions.showLandmarks) {
+      ctx.fillStyle = personColor;
+
+      LANDMARKS.forEach((a) => {
+        const p = lm[a];
+        ctx.beginPath();
+        ctx.arc(
+          p.x * drawingContext.width,
+          p.y * drawingContext.height,
+          3,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      });
     }
   });
 };
@@ -116,7 +133,16 @@ export default function VideoOverlay({
           const nowMs = performance.now();
           const result = await poseLandmarker.detectForVideo(video, nowMs);
           if (result.landmarks) {
-            drawResults(ctx, canvas, draw, result.landmarks, true, true);
+            drawResults(
+              ctx,
+              draw,
+              result.landmarks,
+              { height: canvas.height, width: canvas.width },
+              {
+                showLandmarks: true,
+                showSkeleton: true,
+              }
+            );
           }
         }
       }
