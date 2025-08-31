@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
-import { createPoseLandmarker } from "./lib/poseLandmarker";
+import { getPoseLandmarker } from "./lib/poseLandmarker";
 import VideoOverlay from "./VideoOverlay";
+import { PoseLandmarker } from "@mediapipe/tasks-vision";
 
 export default function App() {
   const [ytUrl, setYtUrl] = useState("");
-  const [poseLandmarker, setPoseLandmarker] = useState<any>(null);
+  const [poseLandmarker, setPoseLandmarker] = useState<PoseLandmarker>();
 
   useEffect(() => {
     (async () => {
-      const lm = await createPoseLandmarker();
+      const lm = await getPoseLandmarker();
       setPoseLandmarker(lm);
     })();
   }, []);

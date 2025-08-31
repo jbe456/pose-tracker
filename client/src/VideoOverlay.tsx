@@ -1,10 +1,14 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import { DrawingUtils, NormalizedLandmark } from "@mediapipe/tasks-vision";
+import {
+  DrawingUtils,
+  NormalizedLandmark,
+  PoseLandmarker,
+} from "@mediapipe/tasks-vision";
 import { EDGES } from "./lib/edges";
 
 interface VideoOverlayProps {
   ytUrl: string;
-  poseLandmarker: any; // MediaPipe PoseLandmarker
+  poseLandmarker: PoseLandmarker;
 }
 
 function syncCanvasToVideo(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
