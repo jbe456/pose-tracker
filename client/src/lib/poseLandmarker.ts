@@ -1,9 +1,9 @@
 import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 
-const POSE_LANDMARKER_MODEL_FULL =
-  "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task";
-const POSE_LANDMARKER_MODEL_HEAVY =
-  "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task";
+const POSE_LANDMARKER_ROOT_URL = `https://storage.googleapis.com/mediapipe-models/pose_landmarker`;
+const POSE_LANDMARKER_MODEL_LITE = `${POSE_LANDMARKER_ROOT_URL}/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task`;
+const POSE_LANDMARKER_MODEL_FULL = `${POSE_LANDMARKER_ROOT_URL}/pose_landmarker_full/float16/latest/pose_landmarker_full.task`;
+const POSE_LANDMARKER_MODEL_HEAVY = `${POSE_LANDMARKER_ROOT_URL}/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task`;
 
 async function createPoseLandmarker(): Promise<PoseLandmarker> {
   const filesetResolver = await FilesetResolver.forVisionTasks(
@@ -11,7 +11,8 @@ async function createPoseLandmarker(): Promise<PoseLandmarker> {
   );
   return PoseLandmarker.createFromOptions(filesetResolver, {
     baseOptions: {
-      modelAssetPath: POSE_LANDMARKER_MODEL_FULL,
+      modelAssetPath: POSE_LANDMARKER_MODEL_LITE,
+      delegate: "GPU",
     },
     runningMode: "VIDEO",
     numPoses: 2,
